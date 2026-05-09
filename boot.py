@@ -33,7 +33,7 @@ def keep_alive():
         time.sleep(10)   # 10 сония
         if RENDER_URL:
             try:
-                r = requests.get(RENDER_URL + "/health", timeout=10)
+                r = requests.get(RENDER_URL + "/health", timeout=30)
                 print(f"[KeepAlive] ping → {r.status_code}")
             except Exception as e:
                 print(f"[KeepAlive] xato: {e}")
@@ -41,7 +41,7 @@ def keep_alive():
 # ══════════════════════════════════════════
 #  ТАНЗИМОТ
 # ══════════════════════════════════════════
-BOT_TOKEN = os.environ.get("BOT_TOKEN","8768507139:AAFecfXqtOThllIbir6nww565BM2dposjhI")
+BOT_TOKEN = os.environ.get("BOT_TOKEN","8764205211:AAEBhZe3gz3NhNZdbckF71IP7Ih3PqJmANQ")
 ADMIN_ID  = 7424107874
 CHANNELS  = ["@zadxpro_film", "@zadxproooo"]
 
