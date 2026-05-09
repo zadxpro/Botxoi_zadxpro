@@ -21,31 +21,32 @@ def health():
 
 def run_flask():
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=port, threaded=True)
 
 # ══════════════════════════════════════════
-#  KEEP-ALIVE — ҳар 10 дақиқа пинг
+#  KEEP-ALIVE — ҳар 1 дақиқа пинг
 # ══════════════════════════════════════════
-RENDER_URL = os.environ.get("RENDER_URL", "")   # ← URL-и Render-и худатро гузор
+RENDER_URL = os.environ.get("RENDER_EXTERNAL_URL", "")
 
 def keep_alive():
+    time.sleep(30)  # Аввал 30 сония интизор шав то Flask бала ояд
     while True:
-        time.sleep(10)   # 10 сония
         if RENDER_URL:
             try:
-                r = requests.get(RENDER_URL + "/health", timeout=30)
-                print(f"[KeepAlive] ping → {r.status_code}")
+                r = requests.get(RENDER_URL + "/health", timeout=10)
+                print(f"[KeepAlive] ✅ ping → {r.status_code}")
             except Exception as e:
-                print(f"[KeepAlive] xato: {e}")
+                print(f"[KeepAlive] ❌ xato: {e}")
+        time.sleep(60)  # 1 дақиқа
 
 # ══════════════════════════════════════════
 #  ТАНЗИМОТ
 # ══════════════════════════════════════════
-BOT_TOKEN = os.environ.get("BOT_TOKEN","8764205211:AAEBhZe3gz3NhNZdbckF71IP7Ih3PqJmANQ")
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "8764205211:AAEBhZe3gz3NhNZdbckF71IP7Ih3PqJmANQ")
 ADMIN_ID  = 7424107874
 CHANNELS  = ["@zadxpro_film", "@zadxproooo"]
 
-bot = telebot.TeleBot(BOT_TOKEN)
+bot = telebot.TeleBot(BOT_TOKEN, parse_mode=None)
 
 USERS_FILE      = "users.json"
 pending_phone   = {}
@@ -219,11 +220,10 @@ PRICES_TEXT = """
     Дастгирии 1 моҳ ройгон
     Тағйироти хурд ройгон
 
-📌 Нарх дақиқ пас аз муҳокида
+📌 Нарх дақиқ пас аз муҳокима
 муайян карда мешавад
 """
 
-# Намунаҳо бе Markdown — @zadxpro_film дар Markdown хато медиҳад
 EXAMPLES_TEXT = (
     "\n"
     "✨  Н а м у н а ҳ о\n"
@@ -409,7 +409,6 @@ def cb_prices(call):
 
 @bot.callback_query_handler(func=lambda c: c.data == "examples")
 def cb_examples(call):
-    # parse_mode=None — чунки @zadxpro_film дар Markdown хато медиҳад
     edit_or_send(call.message.chat.id, call.message.message_id,
                  EXAMPLES_TEXT, back_order_kb(), parse_mode=None)
     bot.answer_callback_query(call.id)
@@ -485,5 +484,15 @@ if __name__ == "__main__":
     t_keep = threading.Thread(target=keep_alive, daemon=True)
     t_keep.start()
 
-    # Бот дар thread-и асосӣ
-    bot.infinity_polling(skip_pending=True)
+    # Бот бо restart_on_change дар thread-и асосӣ
+    while True:
+        try:
+            print("🤖 Polling оғоз...")
+            bot.infinity_polling(
+                skip_pending=True,
+                timeout=60,
+                long_polling_timeout=60
+            )
+        except Exception as e:
+            print(f"[Bot] ❌ Хато: {e} — 5 сония интизор...")
+            time.sleep(5)
