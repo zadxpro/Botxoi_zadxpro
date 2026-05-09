@@ -41,7 +41,7 @@ def keep_alive():
 # ══════════════════════════════════════════
 #  ТАНЗИМОТ
 # ══════════════════════════════════════════
-BOT_TOKEN = os.environ.get("BOT_TOKEN","8764205211:AAEBhZe3gz3NhNZdbckF71IP7Ih3PqJmANQ")
+BOT_TOKEN = os.environ.get("BOT_TOKEN","8768507139:AAFecfXqtOThllIbir6nww565BM2dposjhI")
 ADMIN_ID  = 7424107874
 CHANNELS  = ["@zadxpro_film", "@zadxproooo"]
 
